@@ -1,0 +1,45 @@
+name: st-elastic
+networks:
+  shieldteq:
+    driver: bridge
+
+services:
+  st-elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
+    container_name: elastic
+    volumes:
+      - EData:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+    mem_limit: 1GB
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl http://localhost:9200"
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+  st-kibana:
+    image: docker.elastic.co/kibana/kibana:9.0.0
+    container_name: kibana
+    volumes:
+      - KData:/usr/share/kibana/data
+    ports:
+      - 5601:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=http://elastic:9200
+    depends_on:
+      st-elastic:
+        condition: service_healthy
+volumes:
+  KData:
+    driver: local
+  EData:
+    driver: local

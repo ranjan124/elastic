@@ -25,6 +25,8 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
+    networks:
+      - shieldteq
   st-kibana:
     image: docker.elastic.co/kibana/kibana:9.0.0
     container_name: kibana
@@ -38,6 +40,8 @@ services:
     depends_on:
       st-elastic:
         condition: service_healthy
+    networks:
+      - shieldteq
 volumes:
   KData:
     driver: local
